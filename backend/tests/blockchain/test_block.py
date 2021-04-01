@@ -1,4 +1,4 @@
-form backend.blockchain.block import Block
+from backend.blockchain.block import Block, GENESIS_DATA
 
 def test_mine_block():
     last_block = Block.genesis()
