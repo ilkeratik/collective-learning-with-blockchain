@@ -1,20 +1,20 @@
-**Activate the virtual environment**
+* **Activate the virtual environment**
 
-#### Bash
+*Bash*
 ```
 source blockchain-env/bin/activate
 ```
-#### Powershell
+*Powershell*
 ```
 .\blockchain-env\Scripts\Activate.ps1
 ```
 
-**Install all packages**
+* **Install all packages**
 ```
 pip3 install -r requirements.txt
 ```
 
-**Run the tests**
+* **Run the tests**
 
 Make sure to activate the virtual environment
 
