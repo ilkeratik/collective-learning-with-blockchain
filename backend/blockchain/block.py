@@ -3,7 +3,7 @@ import pandas as pd
 
 from backend.bc_utils.crypto_hash import crypto_hash
 from backend.config import MINE_RATE
-
+from backend.bc_utils.hex_to_binary import hex_to_binary
 GENESIS_DATA = {
     'timestamp': 1,
     'last_hash': 'genesis_last_hash',
@@ -46,7 +46,7 @@ class Block:
         last_hash = last_block.hash
         nonce = 0
         timestamp, hash, difficulty = None, None, None
-        while not hash or hash[0:difficulty] != '0' * difficulty:
+        while not hash or hex_to_binary(hash)[0:difficulty] != '0' * difficulty:
             if hash:
                 nonce += 1
             timestamp = time.time_ns()
@@ -75,7 +75,7 @@ class Block:
         """
         threshold = 0.2
         time_diff =new_timestamp - last_block.timestamp
-        if time_diff < MINE_RATE - threshold:
+        if time_diff < MINE_RATE + threshold:
             return last_block.difficulty + 1
         elif time_diff > MINE_RATE + threshold and last_block.difficulty > 1:
             return last_block.difficulty -1
