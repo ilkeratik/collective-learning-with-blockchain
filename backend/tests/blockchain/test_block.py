@@ -8,6 +8,7 @@ def test_mine_block():
     assert isinstance(block, Block)
     assert block.data == data
     assert block.last_hash == last_block.hash
+    assert block.hash[0:block.difficulty] == '0' * block.difficulty
 
 def test_genesis():
     genesis = Block.genesis()
@@ -16,4 +17,9 @@ def test_genesis():
     
     for key, value in GENESIS_DATA.items():
         assert getattr(genesis, key) == value
- 
+
+def test_quickly_mined_block():
+    last_block = Block.mine_block(Block.genesis(), 'foo')
+    mined_block = Block.mine_block(last_block, 'ilker')
+    
+    assert mined_block.difficulty == last_block.difficulty +1

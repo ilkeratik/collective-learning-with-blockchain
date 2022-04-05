@@ -1,12 +1,16 @@
 import time
+import pandas as pd
 
 from backend.bc_utils.crypto_hash import crypto_hash
-import pandas as pd
+from backend.config import MINE_RATE
+
 GENESIS_DATA = {
     'timestamp': 1,
     'last_hash': 'genesis_last_hash',
     'hash': 'genesis_hash',
-    'data': []
+    'data': [],
+    'difficulty': 3,
+    'nonce': 'genesis_nonce'
 }
 
 class Block:
@@ -14,14 +18,13 @@ class Block:
     Block: a unit of storage.
     Store transactions in a blockchain that supports a cryptocurrency.
     """
-    def __init__(self, timestamp, last_hash, hash, data):
+    def __init__(self, timestamp, last_hash, hash, data, difficulty, nonce):
         self.timestamp = timestamp #creating time
         self.last_hash = last_hash #hash of the block just before this block
         self.hash = hash 
         self.data = data
-
-    def add_block(self, data):
-        self.chain.append(Block(data))
+        self.difficulty = difficulty
+        self.nonce = nonce
 
     def __repr__(self): # string representation of the class
         return (
@@ -29,19 +32,28 @@ class Block:
             f'timestamp: {self.timestamp}, '
             f'last_hash: {self.last_hash}, '
             f'hash: {self.hash}, '
-            f'data: {self.data})'
+            f'data: {self.data}, '
+            f'difficulty: {self.difficulty}, '
+            f'nonce: {self.nonce})'
         )
 
     @staticmethod #gets load when the class is imported and could work directly
     def mine_block(last_block, data): # create a block
         """
-        Mine a block based on the given last_block and data.
+        Mine a block based on the given last_block and data, until a block hash is found that
+        meets the leading 0's of proof of work requires.
         """
-        timestamp = time.time_ns()
         last_hash = last_block.hash
-        hash = crypto_hash(timestamp, last_hash, data) 
-
-        return Block(timestamp, last_hash, hash, data)
+        nonce = 0
+        timestamp, hash, difficulty = None, None, None
+        while not hash or hash[0:difficulty] != '0' * difficulty:
+            if hash:
+                nonce += 1
+            timestamp = time.time_ns()
+            difficulty = Block.adjust_difficulty(last_block, timestamp)
+            hash = crypto_hash(timestamp, last_hash, data, difficulty, nonce)
+        
+        return Block(timestamp, last_hash, hash, data, difficulty, nonce)
 
     @staticmethod
     def genesis():
@@ -55,6 +67,19 @@ class Block:
         #     data=GENESIS_DATA['data']
         # )
         return Block(**GENESIS_DATA) #unpacks the dictionary and passes values as parameter with their original order
+
+    @staticmethod
+    def adjust_difficulty(last_block, new_timestamp):
+        """
+        Calculate and adjust the difficulty according to the MINE_RATE
+        """
+        if(new_timestamp - last_block.timestamp) < MINE_RATE:
+            return last_block.difficulty + 1
+        elif last_block.difficulty > 0:
+            return last_block.difficulty -1
+
+        return last_block.difficulty #1
+
 
 def main():
     genesis_block = Block.genesis()
