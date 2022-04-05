@@ -73,9 +73,11 @@ class Block:
         """
         Calculate and adjust the difficulty according to the MINE_RATE
         """
-        if(new_timestamp - last_block.timestamp) < MINE_RATE:
+        threshold = 0.2
+        time_diff =new_timestamp - last_block.timestamp
+        if time_diff < MINE_RATE - threshold:
             return last_block.difficulty + 1
-        elif last_block.difficulty > 0:
+        elif time_diff > MINE_RATE + threshold and last_block.difficulty > 1:
             return last_block.difficulty -1
 
         return last_block.difficulty #1
