@@ -1,7 +1,12 @@
 **Activate the virtual environment**
 
+#### Bash
 ```
 source blockchain-env/bin/activate
+```
+#### Powershell
+```
+.\blockchain-env\Scripts\Activate.ps1
 ```
 
 **Install all packages**
