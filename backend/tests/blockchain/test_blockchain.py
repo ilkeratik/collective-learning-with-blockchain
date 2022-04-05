@@ -1,4 +1,4 @@
-from backend.blockchain.Blockchain import Blockchain
+from backend.blockchain.blockchain import Blockchain
 from backend.blockchain.block import GENESIS_DATA
 
 def test_blockchain_instance():
@@ -11,4 +11,4 @@ def test_add_block():
     data = 'test_data'
     blockchain.add_block(data)
 
-    assert blockchain.chain[-1].data == data
+    assert blockchain.chain[-1].data == data # does adding took affect on the chain?
