@@ -1,7 +1,7 @@
 import time
 
-from backend.util.crypto_hash import crypto_hash
-
+from backend.bc_utils.crypto_hash import crypto_hash
+import pandas as pd
 GENESIS_DATA = {
     'timestamp': 1,
     'last_hash': 'genesis_last_hash',
@@ -23,7 +23,7 @@ class Block:
     def add_block(self, data):
         self.chain.append(Block(data))
 
-    def __repr__(self):
+    def __repr__(self): # string representation of the class
         return (
             'Block('
             f'timestamp: {self.timestamp}, '
@@ -33,13 +33,13 @@ class Block:
         )
 
     @staticmethod #gets load when the class is imported and could work directly
-    def mine_block(last_block, data):
+    def mine_block(last_block, data): # create a block
         """
         Mine a block based on the given last_block and data.
         """
         timestamp = time.time_ns()
         last_hash = last_block.hash
-        hash = crypto_hash(timestamp, last_hash, data)
+        hash = crypto_hash(timestamp, last_hash, data) 
 
         return Block(timestamp, last_hash, hash, data)
 

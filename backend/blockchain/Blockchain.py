@@ -1,6 +1,6 @@
 
 from backend.blockchain.block import Block
-
+import pandas as pd
 class Blockchain:
     """
     Blockchain: a public ledger(book) of transactions.
@@ -12,8 +12,8 @@ class Blockchain:
     def add_block(self, data):
         self.chain.append(Block.mine_block(self.chain[-1], data)) # adding a new node to the chain
 
-    def __repr__(self): #a structured representation of instances, instead of memory location
-        return f'Blockchain: {self.chain}'
+    def __repr__(self): #a structured string representation of instances, instead of memory location
+        return pd.DataFrame([t.__dict__ for t in self.chain]).to_string()
 
 def main(): #for testing purposes
     blockchain = Blockchain()
