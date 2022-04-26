@@ -19,8 +19,15 @@ class Blockchain:
     
     def chain_df(self):
         return pd.DataFrame([t.__dict__ for t in self.chain])
-        
+
+    def to_json(self):
+        """
+        Serialize the blokchain into a list of blocks.
+        """
+        return list(map(lambda block: block.to_dict(), self.chain))
+
     def replace_chain(self, incoming_chain):
+
         """
         Replace the local chain with the incoming one if the followings applies:
             - the incoming chain is larger than the local one 
