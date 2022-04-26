@@ -2,6 +2,7 @@ import pytest
 
 from backend.blockchain.blockchain import Blockchain
 from backend.blockchain.block import GENESIS_DATA
+from backend.tests.blockchain.test_block import block
 
 def test_blockchain_instance():
     blockchain = Blockchain()
@@ -29,3 +30,22 @@ def test_is_valid_chain(blockchain_w_five_blocks):
     
     with pytest.raises(Exception, match='The genesis block must be valid'):
         Blockchain.is_valid_chain(blockchain_w_five_blocks.chain)
+ 
+def test_replace_chain(blockchain_w_five_blocks):
+    blockchain = Blockchain()
+    blockchain.replace_chain(blockchain_w_five_blocks.chain)
+
+    assert blockchain.chain == blockchain_w_five_blocks.chain #should change the chain with the new one
+
+def test_replace_chain_less_longer_chain(blockchain_w_five_blocks):
+    blockchain = Blockchain()
+
+    with pytest.raises(Exception, match='The incoming chain must be longer'):
+        blockchain_w_five_blocks.replace_chain(blockchain.chain)
+
+def test_replace_chain_bad_chain(blockchain_w_five_blocks):
+    blockchain = Blockchain()
+    blockchain_w_five_blocks.chain[1].hash = 'change_here'
+    with pytest.raises(Exception, match='The incoming chain is invalid'):
+        blockchain.replace_chain(blockchain_w_five_blocks.chain)
+    

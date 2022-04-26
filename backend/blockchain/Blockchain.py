@@ -17,6 +17,23 @@ class Blockchain:
     def __repr__(self): #a structured string representation of instances, instead of memory location
         return pd.DataFrame([t.__dict__ for t in self.chain]).to_string()
     
+    def replace_chain(self, incoming_chain):
+        """
+        Replace the local chain with the incoming one if the followings applies:
+            - the incoming chain is larger than the local one 
+            - the incoming chain formatted correctly
+        """
+
+        if len(incoming_chain) <= len(self.chain):
+            raise Exception('Cannot replace. The incoming chain must be longer')
+        
+        try:
+            Blockchain.is_valid_chain(incoming_chain)
+        except Exception as e:
+            raise Exception(f'Cannot replace. The incoming chain is invalid: {e}')
+        
+        self.chain = incoming_chain
+
     @staticmethod
     def is_valid_chain(chain):
         """
@@ -41,5 +58,5 @@ def main(): #for testing purposes
     print(blockchain)
     print(f'blockchain.py __name__: {__name__}')
 
-if __name__ == '__main__': #only works when the file directly executed, preventing to work when another module uses this class
+if __name__ == '__main__':
     main()
