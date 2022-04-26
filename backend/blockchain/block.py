@@ -46,11 +46,12 @@ class Block:
         return self.__dict__
 
     @staticmethod
-    def from_dict(self, dict):
+    def from_dict(dict):
         """
         Turn json or dict to block object, Deserialize dict to block
         """
         return Block(**dict)
+
 
     @staticmethod #gets load when the class is imported and could work directly
     def mine_block(last_block, data): # create a block

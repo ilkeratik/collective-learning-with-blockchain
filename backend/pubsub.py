@@ -19,7 +19,7 @@ CHANNELS = {
 }
 
 class Listener(SubscribeCallback):
-    def __init(self, blockchain):
+    def __init__(self, blockchain):
         self.blockchain = blockchain
 
     def message(self, pubnub, message_object):
@@ -62,7 +62,7 @@ class PubSub():
 def main():
     pbs = PubSub()
     pbs.publish(CHANNELS['TEST'], {'FOO': 'BAR'})
-    
+
 
 if __name__ == '__main__':
     main()
