@@ -16,8 +16,7 @@ class Blockchain:
 
     def __repr__(self): #a structured string representation of instances, instead of memory location
         return pd.DataFrame([t.__dict__ for t in self.chain]).to_string()
-    def __eq__(self, other):
-        return self.__dict__ == other.__dict__
+    
     @staticmethod
     def is_valid_chain(chain):
         """
@@ -28,7 +27,7 @@ class Blockchain:
         for i,block in enumerate(chain):
             if i == 0: #for the genesis block(chain[0]), there is no previous block to check, we check if it's true
                 if block != Block.genesis():
-                    print(block, Block.genesis())
+                    #print(block, Block.genesis())
                     raise Exception("The genesis block must be valid")
             else:
                 last_block = chain[i-1]
