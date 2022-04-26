@@ -10,13 +10,16 @@ class Blockchain:
     """
     def __init__(self):
         self.chain = [Block.genesis()] #chain is a list that has all blocks in it, the first element is generated manually because a block should have a manually setted up last_hash value
-
+        
     def add_block(self, data):
         self.chain.append(Block.mine_block(self.chain[-1], data)) # adding a new node to the chain
 
     def __repr__(self): #a structured string representation of instances, instead of memory location
         return pd.DataFrame([t.__dict__ for t in self.chain]).to_string()
     
+    def chain_df(self):
+        return pd.DataFrame([t.__dict__ for t in self.chain])
+        
     def replace_chain(self, incoming_chain):
         """
         Replace the local chain with the incoming one if the followings applies:
