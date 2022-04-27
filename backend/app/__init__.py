@@ -7,13 +7,14 @@ from backend.blockchain.blockchain import Blockchain
 app = Flask(__name__)
 blockchain = Blockchain()
 pubsub = PubSub(blockchain)
+
 @app.route('/')
 def index():
     return 'The beginning of everything'
 
 @app.route('/test')
 def test():
-    return 'Ilker Baba'
+    return 'Ilker'
 
 @app.route('/blockchain')
 def route_view_blockchain():
@@ -25,21 +26,31 @@ def route_json_blockchain():
     return jsonify(blockchain.to_json())
 
 
-@app.route('/api/blockchain/mine/<data>', methods=['POST', 'GET' ])
-def route_mine_block(data):
+@app.route('/api/blockchain/mine/<data>', methods=[ 'GET' ])
+def route_mine_block_get(data):
     try:
-        if request.method == 'GET':
-            blockchain.add_block(data)
-        if request.method == 'POST':
-            post_body = request.form
-            print(post_body)
-            blockchain.add_block(post_body.data)
+        blockchain.add_block(data)
 
         block = blockchain.chain[-1]
         pubsub.broadcast_block(block)
         return f'Successfully added block to blockchain, data={data}'
     except Exception as e:
         return e, 500
+
+@app.route('/api/blockchain/mine', methods=[ 'POST' ])
+def route_mine_block():
+    try:
+        post_body = request.form
+        data = post_body['data']
+        print(post_body)
+        blockchain.add_block(data)
+
+        block = blockchain.chain[-1]
+        pubsub.broadcast_block(block)
+        return f'Successfully added block to blockchain, data={data} ', 200
+    except Exception as e:
+        return e, 500
+
 
 ROOT_PORT = 5000
 PORT = 5000
