@@ -53,7 +53,7 @@ def route_mine_block():
 
 
 ROOT_PORT = 5000
-PORT = 5000
+PORT = 5001
 
 if os.environ.get('PEER') == 'True':
     PORT = random.randint(5001, 6000)
