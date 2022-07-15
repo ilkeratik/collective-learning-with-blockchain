@@ -30,20 +30,4 @@ python3 -m backend.app
 
 **Running multiple peer instances (from the same computer)**
 
-- First you must set environment variable in the terminal
-
-
-*Bash*
-```
-export PEER=True 
-```
-
-*Powershell*
-```
-$Env:PEER = "True"
-```
-
-- Then run the code below
-```
-python -m backend.app
-```
+- Use the --trainer, --validator, --peer, parameters when running the app. If no parameter is given, the server starts as root user.
