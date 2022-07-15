@@ -40,7 +40,7 @@ class Block:
     
     def to_dict(self):
         """
-        Serialize the block into a dict of its attributes.
+        Convert-Serialize the block into a dict of its attributes.
         """
         return self.__dict__
 

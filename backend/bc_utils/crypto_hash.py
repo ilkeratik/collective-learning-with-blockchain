@@ -1,17 +1,22 @@
 
 import hashlib
 import json
-
+import numpy as np
 def crypto_hash(*args): 
     """
     Return a sha-256 hash of the given arguments.
     """
-    stringified_args = map(json.dumps, args)
-    #stringified_args = sorted(map(lambda data: json.dumps(data), args)) #it wil supply same hash for different ordered same arguments
-    #joined_data = ''.join(stringified_args) #concat'em all, in this case (12, 34, 56) and (123, 4, 56) will have the same hash result
-    joined_data = '^'.join(stringified_args) #concat'em all
-    
-    return hashlib.sha256(joined_data.encode('utf-8')).hexdigest() #should be encoded first, return the digest result in base 16(up to 64 characters).
+    json_data = json.dumps(args, 
+                        sort_keys=True,
+                       cls=NumpyEncoder)
+    return hashlib.sha256(json_data.encode("utf-8")).hexdigest() #should be encoded first, return the digest result in base 16(up to 64 characters).
+
+class NumpyEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        return json.JSONEncoder.default(self, obj)
+
 
 def main(): #test purpose
     print(f"crypto_hash('one', 2, [3]): {crypto_hash('one', 2, [3])}")

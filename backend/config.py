@@ -6,3 +6,8 @@ SECONDS = 1000 * MILLISECONDS
 MINE_RATE = 1 * SECONDS
 
 STARTING_BALANCE = 1000
+
+MINING_REWARD = 50
+MINING_REWARD_INPUT = { 'address': '*--mining-reward--*' }
+TRAINING_REWARD_INPUT = { 'address': '*--training-reward--*' }
+VALIDATION_REWARD_INPUT = { 'address': '*--validation-reward--*' }

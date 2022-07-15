@@ -1,81 +1,63 @@
-import os, random
-from flask import Flask, jsonify, request
+import random
 import requests
-from backend.pubsub import PubSub
-from backend.blockchain.blockchain import Blockchain
 import argparse
-app = Flask(__name__)
-blockchain = Blockchain()
-pubsub = PubSub(blockchain)
-
-@app.route('/')
-def index():
-    return 'The beginning of everything'
-
-@app.route('/test')
-def test():
-    return 'Ilker'
-
-@app.route('/blockchain')
-def route_view_blockchain():
-    df = blockchain.chain_df()
-    return df.to_html()
-
-@app.route('/api/blockchain')
-def route_json_blockchain():
-    return jsonify(blockchain.to_json())
-
-
-@app.route('/api/blockchain/mine/<data>', methods=[ 'GET' ])
-def route_mine_block_get(data):
-    try:
-        blockchain.add_block(data)
-
-        block = blockchain.chain[-1]
-        pubsub.broadcast_block(block)
-        return f'Successfully added block to blockchain, data={data}'
-    except Exception as e:
-        return e, 500
-
-@app.route('/api/blockchain/mine', methods=[ 'POST' ])
-def route_mine_block():
-    try:
-        post_body = request.form
-        data = post_body['data']
-        print(post_body)
-        blockchain.add_block(data)
-
-        block = blockchain.chain[-1]
-        pubsub.broadcast_block(block)
-        return f'Successfully added block to blockchain, data={data} ', 200
-    except Exception as e:
-        return e, 500
-
-
+from backend.app.blockchain_routes import *
+from backend.pubsub.pubsub import *
+from backend.app.sync_chain_and_pool import *
 ROOT_PORT = 5000
 PORT = ROOT_PORT
 
-arg_parser = argparse.ArgumentParser(description='CLI args interface for the web app')
+if __name__ == 'backend.app':
+    arg_parser = argparse.ArgumentParser(description='CLI args interface for the web app')
 
-arg_parser.add_argument('-p','--peer', dest='peer', action='store_true',help='Start server as a peer')
-arg_parser.add_argument('-t','--trainer', dest='trainer', action='store_true',help='Start server as a trainer')
+    arg_parser.add_argument('-p','--peer', dest='peer', action='store_true',help='Start server as a peer')
+    arg_parser.add_argument('-t','--trainer', dest='trainer', action='store_true',help='Start server as a trainer')
+    arg_parser.add_argument('-v','--validator', dest='validator', action='store_true',help='Start server as a validator')
+    arg_parser.add_argument('-m','--miner', dest='miner', action='store_true',help='Start server as a miner')
 
-arg_parser.set_defaults(peer=False, trainer=False)
+    arg_parser.set_defaults(peer=False, trainer=False)
 
-args = arg_parser.parse_args()
+    args = arg_parser.parse_args()
 
-if args.peer:
-    print("Started server as peer")
-    PORT = random.randint(5001, 6000)
-    res = requests.get(f'http://localhost:{ROOT_PORT}/api/blockchain') #sync latest blockchain
-    print(f'result: {res.json()}')
+    if args.peer:
+        print("Started server as peer")
+        PORT = random.randint(5001, 6000)
+        sync_blockchain(blockchain)
+        sync_transaction_pool(transaction_pool)
+        
+    elif args.trainer:
+        print("Started server as trainer")
+        PORT = random.randint(5001, 6000)
+        print(PORT)
+        pubsub = TrainerPubSub(model_blockchain, task_pool, train_pool)
+        sync_model_blockchain(model_blockchain)
+        sync_task_pool(task_pool)
+        
+    elif args.validator:
+        print("Started server as validator")
+        PORT = random.randint(5001, 6000)
+        pubsub = ValidatorPubSub(model_blockchain, train_pool, validation_pool)
+        sync_model_blockchain(model_blockchain)
+        sync_training_pool(train_pool)
+        sync_validation_pool(validation_pool)
 
-    res_blockchain = Blockchain.from_json(res.json())
-    try:
-        blockchain.replace_chain(res_blockchain.chain)
-        print('\n -- Successfully synchronized the local chain')
-    except Exception as e:
-        print(f'Error when syncing: {e}')
-if args.trainer:
-    print("Started server as trainer")
-app.run(host="0.0.0.0", port=PORT)
+    elif args.miner:
+        print("Started server as miner")
+        PORT = random.randint(5001, 6000)
+        pubsub = MinerPubSub(model_blockchain, train_pool, validation_pool)
+        sync_model_blockchain(model_blockchain)
+        sync_training_pool(train_pool)
+        sync_validation_pool(validation_pool)
+    else:
+        print("Started server as root")
+        pubsub = RootPubSub(blockchain=model_blockchain, 
+        task_pool=task_pool, 
+        train_pool=train_pool, 
+        validation_pool=validation_pool,
+        )
+
+    set_pubsub(pubsub)
+    print(PORT)
+    app.run(host="0.0.0.0", port=PORT)
+
+
